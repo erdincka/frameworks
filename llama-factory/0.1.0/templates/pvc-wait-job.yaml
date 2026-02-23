@@ -1,0 +1,21 @@
+# Helm waits for hook Jobs to complete before deploying the main resources.
+# This gives the storage provisioner time to bind the PVCs.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "llamafactory.fullname" . }}-pvc-wait
+  labels:
+    {{- include "llamafactory.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+spec:
+  template:
+    spec:
+      containers:
+        - name: wait
+          image: busybox:1.36
+          command: ["sh", "-c", "echo 'Waiting for PVCs to bind...' && sleep 30 && echo 'Done'"]
+      restartPolicy: Never
+  backoffLimit: 1

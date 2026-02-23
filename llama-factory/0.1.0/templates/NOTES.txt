@@ -1,0 +1,33 @@
+====================================================================
+  LLaMA Factory has been deployed on PCAI!
+====================================================================
+
+Mode : {{ .Values.mode }}
+Release: {{ .Release.Name }}
+
+{{- if .Values.ezua.virtualService.enabled }}
+
+Access the application at:
+  https://{{ .Values.ezua.virtualService.endpoint }}
+
+NOTE: Replace ${DOMAIN_NAME} with your actual PCAI domain
+      during deployment via the Import Framework values editor.
+{{- else }}
+
+Port-forward to access locally:
+  kubectl port-forward svc/{{ include "llamafactory.fullname" . }} 7860:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  Then open http://localhost:7860
+{{- end }}
+
+GPU Resources requested:
+  {{ .Values.resources.requests | toJson }}
+
+Persistent Volumes:
+  HF Cache  : {{ if .Values.persistence.hfCache.enabled }}{{ .Values.persistence.hfCache.size }}{{ else }}disabled{{ end }}
+  Data      : {{ if .Values.persistence.data.enabled }}{{ .Values.persistence.data.size }}{{ else }}disabled{{ end }}
+  Output    : {{ if .Values.persistence.output.enabled }}{{ .Values.persistence.output.size }}{{ else }}disabled{{ end }}
+
+The Gradio WebUI has NO built-in authentication.
+Consider setting a username/password via environment variables
+or rely on PCAI's platform-level access controls.
+====================================================================

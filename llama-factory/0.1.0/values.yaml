@@ -1,0 +1,145 @@
+# LlamaFactory Helm Chart – values.yaml
+# Designed for HPE Private Cloud AI (PCAI) Import Framework
+
+replicaCount: 1
+
+image:
+  repository: hiyouga/llamafactory
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+
+# LlamaFactory Application Settings
+
+# mode: "webui" launches the Gradio LLaMA Board on port 7860
+# mode: "api"   launches the OpenAI-compatible API on port 8000
+mode: "webui"
+
+# Gradio WebUI settings (only used when mode=webui)
+gradio:
+  serverPort: 7860
+  # Set to "0.0.0.0" so it is reachable inside the pod
+  serverName: "0.0.0.0"
+
+# API settings (only used when mode=api)
+api:
+  port: 8000
+
+# Extra environment variables passed to the container
+extraEnv: []
+  # - name: USE_MODELSCOPE_HUB
+  #   value: "1"
+
+# HuggingFace Token (required for gated models like LLaMA,
+# Gemma, Mistral, etc.). Stored as a Kubernetes Secret.
+
+huggingface:
+  token: ""
+  # Alternatively, reference an existing secret:
+  # existingSecret: "my-hf-secret"
+  # existingSecretKey: "HF_TOKEN"
+
+
+# Service
+
+service:
+  type: ClusterIP
+  # port exposed by the Service object
+  port: 7860
+  targetPort: 7860
+
+
+# GPU / Resource Requests & Limits
+
+resources:
+  limits:
+    nvidia.com/gpu: "1"
+    memory: "64Gi"
+    cpu: "16"
+  requests:
+    nvidia.com/gpu: "1"
+    memory: "32Gi"
+    cpu: "8"
+
+
+# Shared Memory (required for PyTorch DataLoader workers
+# and multi-process training). Mounted as /dev/shm.
+
+shmSizeGi: 16
+
+
+# Persistence – model cache, datasets, training output
+
+persistence:
+  # HuggingFace cache (model weights download cache)
+  hfCache:
+    enabled: true
+    size: 200Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    mountPath: /root/.cache/huggingface
+
+  # Custom datasets (mounted separately to preserve built-in /app/data)
+  data:
+    enabled: true
+    size: 50Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    mountPath: /app/custom_data
+
+  # Training outputs & exported models
+  output:
+    enabled: true
+    size: 100Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    mountPath: /app/output
+
+
+# Security context – runs as root (matches upstream image)
+
+podSecurityContext: {}
+
+securityContext: {}
+  # runAsUser: 0
+  # runAsGroup: 0
+
+
+# Tolerations, Node Selectors, Affinity
+
+tolerations:
+  - key: nvidia.com/gpu
+    operator: Exists
+    effect: NoSchedule
+
+nodeSelector: {}
+  # nvidia.com/gpu.present: "true"
+
+affinity: {}
+
+
+# Pod-level settings
+
+# hostIPC enables /dev/shm sharing with the host (helpful
+# for NCCL multi-GPU comms). Set to false if your cluster
+# policy forbids it; the chart also mounts an emptyDir shm.
+hostIPC: false
+
+
+# PCAI / EzUA Integration  (Istio + Kyverno)
+
+ezua:
+  virtualService:
+    enabled: true
+    # IMPORTANT – replace with your PCAI domain at deploy time
+    endpoint: "llamafactory.${DOMAIN_NAME}"
+    istioGateway: "istio-system/ezaf-gateway"
+  kyverno:
+    enabled: true
+    # Labels automatically applied to the Deployment by Kyverno
+    labels:
+      sidecar.istio.io/inject: "true"

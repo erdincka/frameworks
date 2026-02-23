@@ -1,0 +1,23 @@
+apiVersion: v2
+name: llamafactory
+description: >-
+  LLaMA Factory - Unified Efficient Fine-Tuning of 100+ LLMs & VLMs.
+  Provides a zero-code Web UI (Gradio) and CLI for fine-tuning large language models,
+  packaged for deployment on HPE Private Cloud AI (PCAI) via Import Framework.
+type: application
+version: 0.1.0
+appVersion: "0.9.2"
+keywords:
+  - llm
+  - fine-tuning
+  - lora
+  - qlora
+  - gradio
+  - machine-learning
+  - deep-learning
+  - pcai
+home: https://github.com/hiyouga/LlamaFactory
+sources:
+  - https://github.com/hiyouga/LlamaFactory
+maintainers:
+  - name: PCAI-Porting

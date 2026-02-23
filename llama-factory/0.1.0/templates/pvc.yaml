@@ -1,0 +1,68 @@
+{{- if .Values.persistence.hfCache.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "llamafactory.fullname" . }}-hf-cache
+  labels:
+    {{- include "llamafactory.labels" . | nindent 4 }}
+  annotations:
+    # Create PVCs before the pod is deployed; keep them on uninstall
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+    - {{ .Values.persistence.hfCache.accessMode }}
+  {{- if .Values.persistence.hfCache.storageClass }}
+  storageClassName: {{ .Values.persistence.hfCache.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.hfCache.size }}
+{{- end }}
+---
+{{- if .Values.persistence.data.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "llamafactory.fullname" . }}-data
+  labels:
+    {{- include "llamafactory.labels" . | nindent 4 }}
+  annotations:
+    # Create PVCs before the pod is deployed; keep them on uninstall
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+    - {{ .Values.persistence.data.accessMode }}
+  {{- if .Values.persistence.data.storageClass }}
+  storageClassName: {{ .Values.persistence.data.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.data.size }}
+{{- end }}
+---
+{{- if .Values.persistence.output.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "llamafactory.fullname" . }}-output
+  labels:
+    {{- include "llamafactory.labels" . | nindent 4 }}
+  annotations:
+    # Create PVCs before the pod is deployed; keep them on uninstall
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+    - {{ .Values.persistence.output.accessMode }}
+  {{- if .Values.persistence.output.storageClass }}
+  storageClassName: {{ .Values.persistence.output.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.output.size }}
+{{- end }}

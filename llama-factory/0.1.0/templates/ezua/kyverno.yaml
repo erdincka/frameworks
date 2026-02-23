@@ -1,0 +1,32 @@
+{{- if .Values.ezua.kyverno.enabled }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ include "llamafactory.fullname" . }}-add-labels
+  labels:
+    {{- include "llamafactory.labels" . | nindent 4 }}
+  annotations:
+    policies.kyverno.io/title: Add Istio sidecar labels to LlamaFactory pods
+    policies.kyverno.io/description: >-
+      Automatically injects the required labels on the LlamaFactory
+      Deployment so that the Istio sidecar proxy is injected and the
+      pod is reachable through the PCAI Istio gateway.
+spec:
+  rules:
+    - name: add-labels
+      match:
+        resources:
+          kinds:
+            - Deployment
+          names:
+            - {{ include "llamafactory.fullname" . }}
+          namespaces:
+            - {{ .Release.Namespace | quote }}
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              metadata:
+                labels:
+                  {{- toYaml .Values.ezua.kyverno.labels | nindent 18 }}
+{{- end }}
