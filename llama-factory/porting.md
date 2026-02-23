@@ -2,7 +2,7 @@
 
 ## About LLaMA Factory
 
-LLaMA Factory is an open-source, unified framework for efficiently fine-tuning over 100 large language models (LLMs) and vision-language models (VLMs). Presented at ACL 2024, it is one of the most popular LLM fine-tuning tools in the community with 67.4k GitHub[https://github.com/hiyouga/LlamaFactory/tree/main] stars (19 Feb 2026).
+LLaMA Factory is an open-source, unified framework for efficiently fine-tuning over 100 large language models (LLMs) and vision-language models (VLMs). Presented at ACL 2024, it is one of the most popular LLM fine-tuning tools in the community with 67.4k [GitHub](https://github.com/hiyouga/LlamaFactory/tree/main) stars (19 Feb 2026).
 
 ### Key Features
 
@@ -52,15 +52,7 @@ LlamaFactory supports two primary modes — the Gradio Web UI for interactive fi
 **Solution:** `values.mode` toggles the container command between `llamafactory-cli webui` and `llamafactory-cli api`, and switches the container port accordingly.
 
 
-## What Was Explicitly Excluded
-
-| Item | Reason |
-|------|--------|
-| **KeyCloak / OAuth redirect** | Excluded per requirements. No authentication proxy or OIDC redirect is configured. |
-| **Airgap registry support** | Excluded per requirements. The chart pulls from Docker Hub (`hiyouga/llamafactory`). For airgap, operators would re-tag the image to their internal registry and override `image.repository`. |
-
-
-## Important Notes on Credentials & Login
+## Credentials & Login
 
 - **LlamaFactory's Gradio WebUI does NOT have built-in authentication.** Anyone with network access to the endpoint can use the fine-tuning interface.
 - On PCAI, access is implicitly restricted to authenticated platform users who can reach the Tools & Frameworks endpoint. However, there is no per-user login screen within LlamaFactory itself.
